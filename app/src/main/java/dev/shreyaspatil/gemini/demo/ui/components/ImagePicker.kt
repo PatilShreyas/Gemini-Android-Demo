@@ -49,10 +49,8 @@ fun ImagePicker(modifier: Modifier = Modifier, onImagePicked: (ImageBitmap) -> U
     Icon(
         Icons.Filled.Image,
         contentDescription = "Attach Image",
-        modifier = Modifier
+        modifier = modifier
             .padding(4.dp)
-            .clickable(onClick = {
-                launcher.launch("image/*")
-            }),
+            .clickable(onClick = { launcher.launch("image/*") })
     )
 }

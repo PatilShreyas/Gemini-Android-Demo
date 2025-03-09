@@ -1,4 +1,4 @@
-package dev.shreyaspatil.gemini.demo.ui.screen.simpleprompt
+package dev.shreyaspatil.gemini.demo.ui.screen.imagecaption
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -14,8 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -27,35 +26,35 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.shreyaspatil.gemini.demo.ComposeActivity
 import dev.shreyaspatil.gemini.demo.ui.components.ImagePicker
+import dev.shreyaspatil.gemini.demo.ui.components.dashedBorder
 import dev.shreyaspatil.gemini.demo.ui.theme.ErrorBackground
 import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
 import dev.shreyaspatil.gemini.demo.ui.theme.SuccessBackground
 
-class SimplePromptActivity : ComposeActivity() {
+class ImageCaptionGenActivity : ComposeActivity() {
     @Composable
     override fun RenderScreen() {
-        val viewModel = viewModel<SimplePromptViewModel>()
+        val viewModel = viewModel<ImageCaptionGenViewModel>()
         val state = viewModel.state.collectAsStateWithLifecycle()
 
         SimplePromptScreen(
             state = state.value,
-            onPromptChange = viewModel::onPromptChange,
             onGenerateButtonClick = viewModel::generateResponse,
             onImageAttached = viewModel::onImageAttached
         )
@@ -65,8 +64,7 @@ class SimplePromptActivity : ComposeActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimplePromptScreen(
-    state: SimpleScreenUiState,
-    onPromptChange: (String) -> Unit = {},
+    state: ImageCaptionGenScreenUiState,
     onGenerateButtonClick: () -> Unit = {},
     onImageAttached: (ImageBitmap?) -> Unit = {},
 ) {
@@ -85,67 +83,19 @@ fun SimplePromptScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
-                value = state.prompt,
-                onValueChange = onPromptChange,
-                maxLines = 5,
-                placeholder = {
-                    if (state.prompt.isBlank()) {
-                        Text(text = "Write your prompt")
-                    }
-                },
-                leadingIcon = {
-                    ImagePicker(onImagePicked = onImageAttached)
-                },
-                trailingIcon = {
-                    if (state.prompt.isNotBlank()) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "Clear prompt",
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clickable { onPromptChange("") },
-                        )
-                    }
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-                keyboardActions = KeyboardActions(onGo = { onGenerateButtonClick() }),
-                modifier = Modifier.fillMaxWidth()
+            AttachImageArea(
+                Modifier
+                    .fillMaxWidth()
+                    .height(250.dp),
+                attachedImage = state.attachedImage,
+                onImageAttached = onImageAttached
             )
-
-            state.attachedImage?.let { image ->
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                ) {
-                    Image(
-                        bitmap = image,
-                        contentDescription = "Attached image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    Icon(
-                        Icons.Default.Clear,
-                        "Clear attached image",
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .background(
-                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                                CircleShape
-                            )
-                            .padding(4.dp)
-                            .clickable { onImageAttached(null) },
-                        tint = MaterialTheme.colorScheme.onSecondary
-                    )
-                }
-            }
 
             Button(
                 onClick = onGenerateButtonClick,
-                enabled = !state.isLoading && state.prompt.isNotBlank()
+                enabled = !state.isLoading
             ) {
-                Text("Generate response")
+                Text("Generate Caption")
                 if (state.isLoading) {
                     CircularProgressIndicator(
                         Modifier
@@ -160,8 +110,8 @@ fun SimplePromptScreen(
             HorizontalDivider()
 
             val cardBackground = when {
-                state.isError -> CardDefaults.cardColors(containerColor = ErrorBackground)
-                state.response.isNotBlank() -> CardDefaults.cardColors(containerColor = SuccessBackground)
+                state.errorMessage != null -> CardDefaults.cardColors(containerColor = ErrorBackground)
+                state.response != null -> CardDefaults.cardColors(containerColor = SuccessBackground)
                 else -> CardDefaults.cardColors()
             }
 
@@ -172,15 +122,59 @@ fun SimplePromptScreen(
                     .padding(top = 4.dp),
                 colors = cardBackground
             ) {
-                if (state.response.isEmpty()) {
-                    Text("Response will appear here", modifier = Modifier.padding(8.dp))
+                val response = state.response
+                if (response == null) {
+                    Text("Caption will appear here", modifier = Modifier.padding(8.dp))
                 } else {
                     Text(
-                        text = state.response,
+                        text = state.response.toString(),
                         modifier = Modifier.padding(8.dp)
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AttachImageArea(
+    modifier: Modifier = Modifier,
+    attachedImage: ImageBitmap? = null,
+    onImageAttached: (ImageBitmap?) -> Unit = {},
+) {
+    Box(
+        modifier
+            .background(Color.White.copy(alpha = 0.1f))
+            .dashedBorder(2.dp, Color.White, 10.dp, 10.dp, RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        ImagePicker(Modifier.size(100.dp), onImagePicked = onImageAttached)
+
+        attachedImage?.let { image ->
+            Image(
+                bitmap = image,
+                contentDescription = "Attached image",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Icon(
+                Icons.Default.Clear,
+                "Clear attached image",
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .background(
+                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                        CircleShape
+                    )
+                    .padding(12.dp)
+                    .clickable { onImageAttached(null) },
+                tint = MaterialTheme.colorScheme.onSecondary
+            )
         }
     }
 }
@@ -190,45 +184,23 @@ fun SimplePromptScreen(
 @Composable
 fun SimplePromptScreenPreview_empty() {
     GeminiDemoTheme {
-        SimplePromptScreen(SimpleScreenUiState())
+        SimplePromptScreen(ImageCaptionGenScreenUiState())
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SimplePromptScreenPreview_prompt() {
-    GeminiDemoTheme {
-        SimplePromptScreen(SimpleScreenUiState(prompt = "Lorem Ipsum"))
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun SimplePromptScreenPreview_response() {
     GeminiDemoTheme {
         SimplePromptScreen(
-            SimpleScreenUiState(
-                prompt = "Lorem Ipsum",
-                response = """
+            ImageCaptionGenScreenUiState(
+                response = ImageCaptionGenScreenUiState.Response(
+                    """
                         Solara vesta quintonis meridia, tempora fluctuatis.
-                        Caelum umbra voxilis, lumina astralis gravitas.
-                        Fluentia nexus temporalis, veridian nexus inceptum.
-                        Orbis structura silentia, aetheria claritas resonata.
-                        Zenithia motus temporis, cardinalis forma lumina.
-                   """.trimIndent()
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SimplePromptScreenPreview_loading() {
-    GeminiDemoTheme {
-        SimplePromptScreen(
-            SimpleScreenUiState(
-                prompt = "Lorem Ipsum",
-                isLoading = true
+                   """.trimIndent(),
+                    listOf("#trending", "#wow", "#android", "#life")
+                )
             )
         )
     }

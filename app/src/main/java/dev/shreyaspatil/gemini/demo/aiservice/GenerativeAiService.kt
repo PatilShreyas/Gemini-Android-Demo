@@ -22,6 +22,15 @@ class GenerativeAiService private constructor(
         )
     }
 
+    suspend fun generateCaption(image: Bitmap): GenerateContentResponse {
+        return modelRepository.getImageCaptionClient().generateContent(
+            content {
+                image(image)
+                text("Generate a creative caption and relevant hashtags from this image for a social media post.")
+            }
+        )
+    }
+
     fun startChat(history: List<Content>) = modelRepository.getSimpleClient().startChat(history)
 
     companion object {
