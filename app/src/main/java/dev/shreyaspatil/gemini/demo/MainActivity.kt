@@ -1,0 +1,61 @@
+package dev.shreyaspatil.gemini.demo
+
+import android.app.Activity
+import android.content.Intent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import dev.shreyaspatil.gemini.demo.ui.simpleprompt.SimplePromptActivity
+import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
+import kotlin.reflect.KClass
+
+class MainActivity : ComposeActivity() {
+    @Composable
+    override fun RenderScreen() {
+        MenuScreen(onNavigateTo = ::navigate)
+    }
+
+    private fun navigate(activityClass: KClass<out Activity>) {
+        startActivity(Intent(this, activityClass.java))
+    }
+}
+
+@Composable
+fun MenuScreen(onNavigateTo: (KClass<out Activity>) -> Unit = {}) {
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            Modifier
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Menu("Simple Prompt") { onNavigateTo(SimplePromptActivity::class) }
+            Menu("Image") { onNavigateTo(SimplePromptActivity::class) }
+            Menu("Simple Prompt") { onNavigateTo(SimplePromptActivity::class) }
+        }
+    }
+}
+
+@Composable
+fun Menu(label: String, onClick: () -> Unit) {
+    OutlinedButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Text(label)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    GeminiDemoTheme {
+        MenuScreen()
+    }
+}
