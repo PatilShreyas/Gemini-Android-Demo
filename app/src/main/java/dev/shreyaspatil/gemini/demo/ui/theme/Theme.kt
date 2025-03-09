@@ -13,11 +13,11 @@ private val DarkColors = darkColorScheme(
     onTertiary = onTertiary,
     background = background,
     onBackground = onBackground,
+    surface = surface
 )
 
 @Composable
 fun GeminiDemoTheme(content: @Composable () -> Unit) {
-
     MaterialTheme(
         colorScheme = DarkColors,
         typography = Typography,
