@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
 
-abstract class ComposeActivity: ComponentActivity() {
+abstract class ComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

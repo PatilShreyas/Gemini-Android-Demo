@@ -29,17 +29,20 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -50,7 +53,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.shreyaspatil.gemini.demo.ComposeActivity
+import dev.shreyaspatil.gemini.demo.ui.theme.ErrorBackground
 import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
+import dev.shreyaspatil.gemini.demo.ui.theme.SuccessBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -69,6 +74,7 @@ class SimplePromptActivity : ComposeActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimplePromptScreen(
     state: SimpleScreenUiState,
@@ -76,7 +82,13 @@ fun SimplePromptScreen(
     onGenerateButtonClick: () -> Unit = {},
     onImageAttached: (ImageBitmap?) -> Unit = {},
 ) {
-    Scaffold {
+    Scaffold(
+        topBar = {
+            TopAppBar(title = {
+                Text("Simple Prompt")
+            })
+        }
+    ) {
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
@@ -85,7 +97,7 @@ fun SimplePromptScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TextField(
+            OutlinedTextField(
                 value = state.prompt,
                 onValueChange = onPromptChange,
                 maxLines = 5,
@@ -130,7 +142,10 @@ fun SimplePromptScreen(
                         "Clear attached image",
                         Modifier
                             .align(Alignment.TopEnd)
-                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f), CircleShape)
+                            .background(
+                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                                CircleShape
+                            )
                             .padding(4.dp)
                             .clickable { onImageAttached(null) },
                         tint = MaterialTheme.colorScheme.onSecondary
@@ -138,7 +153,10 @@ fun SimplePromptScreen(
                 }
             }
 
-            Button(onClick = onGenerateButtonClick, enabled = !state.isLoading) {
+            Button(
+                onClick = onGenerateButtonClick,
+                enabled = !state.isLoading && state.prompt.isNotBlank()
+            ) {
                 Text("Generate response")
                 if (state.isLoading) {
                     CircularProgressIndicator(
@@ -151,11 +169,20 @@ fun SimplePromptScreen(
                 }
             }
 
+            HorizontalDivider()
+
+            val cardBackground = when {
+                state.isError -> CardDefaults.cardColors(containerColor = ErrorBackground)
+                state.response.isNotBlank() -> CardDefaults.cardColors(containerColor = SuccessBackground)
+                else -> CardDefaults.cardColors()
+            }
+
             Card(
                 Modifier
                     .fillMaxWidth()
                     .animateContentSize()
-                    .padding(4.dp)
+                    .padding(top = 4.dp),
+                colors = cardBackground
             ) {
                 if (state.response.isEmpty()) {
                     Text("Response will appear here", modifier = Modifier.padding(8.dp))

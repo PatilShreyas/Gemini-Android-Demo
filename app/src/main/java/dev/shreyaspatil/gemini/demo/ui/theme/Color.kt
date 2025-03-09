@@ -10,3 +10,6 @@ val tertiary = Color(0xFF232D3F)
 val onTertiary = Color(0xFFFFFFFF)
 val background = Color(0xFF0F0F0F)
 val onBackground = Color(0xFFFFFFFF)
+
+val SuccessBackground = Color(0xFF4D6959)
+val ErrorBackground = Color(0xFF795461)

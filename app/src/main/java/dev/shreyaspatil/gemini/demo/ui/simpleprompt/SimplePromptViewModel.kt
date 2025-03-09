@@ -17,6 +17,7 @@ data class SimpleScreenUiState(
     val prompt: String = "",
     val attachedImage: ImageBitmap? = null,
     val response: String = "",
+    val isError: Boolean = false,
 )
 
 class SimplePromptViewModel(
@@ -25,18 +26,21 @@ class SimplePromptViewModel(
     private val prompt = MutableStateFlow("")
     private val response = MutableStateFlow("")
     private val isLoading = MutableStateFlow(false)
+    private val isError = MutableStateFlow(false)
     private val attachedImage = MutableStateFlow<ImageBitmap?>(null)
 
     val state = combine(
         prompt,
         response,
         isLoading,
+        isError,
         attachedImage
-    ) { prompt, response, isLoading, attachedImage ->
+    ) { prompt, response, isLoading, isError, attachedImage ->
         SimpleScreenUiState(
             isLoading = isLoading,
             prompt = prompt,
             response = response,
+            isError = isError,
             attachedImage = attachedImage
         )
     }.stateIn(
@@ -56,6 +60,7 @@ class SimplePromptViewModel(
     fun generateResponse() {
         viewModelScope.launch {
             isLoading.value = true
+            response.value = ""
 
             try {
                 val image = attachedImage.value
@@ -65,7 +70,9 @@ class SimplePromptViewModel(
                     aiService.generateContent(prompt.value)
                 }
                 response.value = aiResponse.text ?: ""
+                isError.value = false
             } catch (e: Throwable) {
+                isError.value = true
                 response.value = "Error occurred: ${(e.message ?: "Something went wrong")}"
             } finally {
                 isLoading.value = false
