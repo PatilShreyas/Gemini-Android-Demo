@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.shreyaspatil.gemini.demo.ui.simpleprompt.SimplePromptActivity
+import dev.shreyaspatil.gemini.demo.ui.screen.simpleprompt.SimplePromptActivity
 import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
 import kotlin.reflect.KClass
 

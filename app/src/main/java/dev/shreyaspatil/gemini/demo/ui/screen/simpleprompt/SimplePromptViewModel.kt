@@ -1,4 +1,4 @@
-package dev.shreyaspatil.gemini.demo.ui.simpleprompt
+package dev.shreyaspatil.gemini.demo.ui.screen.simpleprompt
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap

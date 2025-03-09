@@ -1,4 +1,4 @@
-package dev.shreyaspatil.gemini.demo.ui.simpleprompt
+package dev.shreyaspatil.gemini.demo.ui.screen.simpleprompt
 
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.shreyaspatil.gemini.demo.ComposeActivity
+import dev.shreyaspatil.gemini.demo.ui.components.ImagePicker
 import dev.shreyaspatil.gemini.demo.ui.theme.ErrorBackground
 import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
 import dev.shreyaspatil.gemini.demo.ui.theme.SuccessBackground
@@ -197,40 +198,7 @@ fun SimplePromptScreen(
     }
 }
 
-@Composable
-fun ImagePicker(onImagePicked: (ImageBitmap) -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            val imageUri = uri ?: run {
-                Toast.makeText(context, "Image not attached", Toast.LENGTH_SHORT).show()
-                return@rememberLauncherForActivityResult
-            }
-            scope.launch(Dispatchers.Default) {
-                val bitmap = if (Build.VERSION.SDK_INT < 28) {
-                    MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
-                } else {
-                    val source = ImageDecoder.createSource(context.contentResolver, imageUri)
-                    ImageDecoder.decodeBitmap(source)
-                }
-                bitmap?.let {
-                    onImagePicked(it.asImageBitmap())
-                }
-            }
-        }
-
-    Icon(
-        Icons.Filled.Image,
-        contentDescription = "Attach Image",
-        Modifier
-            .padding(4.dp)
-            .clickable(onClick = {
-                launcher.launch("image/*")
-            }),
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
