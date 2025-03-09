@@ -117,7 +117,7 @@ fun SimplePromptScreen(
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(200.dp)
                 ) {
                     Image(
                         bitmap = image,
