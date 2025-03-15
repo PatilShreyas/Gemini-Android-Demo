@@ -69,7 +69,7 @@ class SimplePromptViewModel(
                 } else {
                     aiService.generateContent(prompt.value)
                 }
-                response.value = aiResponse.text ?: ""
+                response.value = aiResponse ?: ""
                 isError.value = false
             } catch (e: Throwable) {
                 isError.value = true

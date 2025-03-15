@@ -14,3 +14,6 @@ val surface = Color(0xFF171C18)
 
 val SuccessBackground = Color(0xFF4D6959)
 val ErrorBackground = Color(0xFF795461)
+
+val SenderBackground = Color(0xFF6D947E)
+val ReceiverBackground = Color(0xFF8D6D94)

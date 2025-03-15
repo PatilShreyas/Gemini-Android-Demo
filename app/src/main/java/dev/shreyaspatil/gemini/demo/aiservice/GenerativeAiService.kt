@@ -11,8 +11,8 @@ class GenerativeAiService private constructor(
     private val modelRepository: GenerativeModelRepository,
 ) {
 
-    suspend fun generateContent(prompt: String): GenerateContentResponse {
-        return modelRepository.getSimpleClient().generateContent(prompt)
+    suspend fun generateContent(prompt: String): String? {
+        return modelRepository.getSimpleClient().generateContent(prompt).text
     }
 
     suspend fun generateContent(prompt: String, image: Bitmap): String? {
@@ -34,8 +34,6 @@ class GenerativeAiService private constructor(
             Json.decodeFromString<CaptionResponse>(it)
         }
     }
-
-    fun startChat(history: List<Content>) = modelRepository.getSimpleClient().startChat(history)
 
     companion object {
         val instance = GenerativeAiService(GenerativeModelRepository())
