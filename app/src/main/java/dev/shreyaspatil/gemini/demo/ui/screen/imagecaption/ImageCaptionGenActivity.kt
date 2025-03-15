@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -61,7 +63,7 @@ class ImageCaptionGenActivity : ComposeActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SimplePromptScreen(
     state: ImageCaptionGenScreenUiState,
@@ -93,7 +95,7 @@ fun SimplePromptScreen(
 
             Button(
                 onClick = onGenerateButtonClick,
-                enabled = !state.isLoading
+                enabled = !state.isLoading && state.attachedImage != null
             ) {
                 Text("Generate Caption")
                 if (state.isLoading) {
@@ -109,9 +111,12 @@ fun SimplePromptScreen(
 
             HorizontalDivider()
 
+            val errorMessage = state.errorMessage
+            val response = state.response
+
             val cardBackground = when {
-                state.errorMessage != null -> CardDefaults.cardColors(containerColor = ErrorBackground)
-                state.response != null -> CardDefaults.cardColors(containerColor = SuccessBackground)
+                errorMessage != null -> CardDefaults.cardColors(containerColor = ErrorBackground)
+                response != null -> CardDefaults.cardColors(containerColor = SuccessBackground)
                 else -> CardDefaults.cardColors()
             }
 
@@ -122,14 +127,34 @@ fun SimplePromptScreen(
                     .padding(top = 4.dp),
                 colors = cardBackground
             ) {
-                val response = state.response
                 if (response == null) {
-                    Text("Caption will appear here", modifier = Modifier.padding(8.dp))
+                    if (errorMessage != null) {
+                        Text(errorMessage, modifier = Modifier.padding(8.dp))
+                    } else {
+                        Text("Caption will appear here", modifier = Modifier.padding(8.dp))
+                    }
+
                 } else {
                     Text(
-                        text = state.response.toString(),
+                        text = state.response.caption,
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(8.dp)
                     )
+                    FlowRow(Modifier.padding(8.dp)) {
+                        state.response.hashtags.forEach { hashtag ->
+                            Box(
+                                Modifier
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .background(
+                                        Color.White.copy(alpha = 0.4f),
+                                        RoundedCornerShape(24.dp)
+                                    )
+                                    .padding(horizontal = 8.dp)
+                            ) {
+                                Text(hashtag, style = MaterialTheme.typography.labelLarge)
+                            }
+                        }
+                    }
                 }
             }
         }

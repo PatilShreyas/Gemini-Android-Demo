@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.screen.simpleprompt.SimplePromptActivity" />
+        <activity android:name=".ui.screen.imagecaption.ImageCaptionGenActivity" />
     </application>
 
 </manifest>
