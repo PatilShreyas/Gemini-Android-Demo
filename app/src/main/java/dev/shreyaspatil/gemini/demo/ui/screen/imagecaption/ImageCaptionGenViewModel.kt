@@ -1,21 +1,15 @@
 package dev.shreyaspatil.gemini.demo.ui.screen.imagecaption
 
-import android.util.JsonReader
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.shreyaspatil.gemini.demo.aiservice.GenerativeAiService
-import dev.shreyaspatil.gemini.demo.aiservice.model.CaptionResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonDecoder
-import kotlinx.serialization.json.JsonObject
 
 data class ImageCaptionGenScreenUiState(
     val isLoading: Boolean = false,
@@ -29,7 +23,6 @@ data class ImageCaptionGenScreenUiState(
 class ImageCaptionGenViewModel(
     private val aiService: GenerativeAiService = GenerativeAiService.instance,
 ) : ViewModel() {
-    private val prompt = MutableStateFlow("")
     private val response = MutableStateFlow<ImageCaptionGenScreenUiState.Response?>(null)
     private val isLoading = MutableStateFlow(false)
     private val errorMessage = MutableStateFlow<String?>(null)
@@ -65,20 +58,19 @@ class ImageCaptionGenViewModel(
             try {
                 val image = attachedImage.value
                 if (image != null) {
-                    val aiResponse = aiService.generateCaption(image.asAndroidBitmap())
-                    aiResponse.text?.let {
-                        runCatching {
-                            val captionResponse = Json.decodeFromString<CaptionResponse>(it)
+                    runCatching {
+                        aiService.generateCaption(image.asAndroidBitmap())?.let {
                             response.value = ImageCaptionGenScreenUiState.Response(
-                                caption = captionResponse.caption,
-                                hashtags = captionResponse.hashtags.map { if (it.startsWith("#")) it else "#$it" }
+                                caption = it.caption,
+                                hashtags = it.hashtags.map { if (it.startsWith("#")) it else "#$it" }
                             )
                             errorMessage.value = null
-                        }.getOrElse {
-                            response.value = null
-                            errorMessage.value = "Error occurred: ${(it.message ?: "Something went wrong")}"
-                            it.printStackTrace()
                         }
+                    }.getOrElse {
+                        response.value = null
+                        errorMessage.value =
+                            "Error occurred: ${(it.message ?: "Something went wrong")}"
+                        it.printStackTrace()
                     } ?: run {
                         errorMessage.value = "No response :("
                     }
