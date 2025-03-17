@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".DemoApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -25,6 +29,7 @@
         </activity>
         <activity android:name=".ui.screen.simpleprompt.SimplePromptActivity" />
         <activity android:name=".ui.screen.imagecaption.ImageCaptionGenActivity" />
+        <activity android:name=".ui.screen.assistant.AssistantActivity" />
     </application>
 
 </manifest>

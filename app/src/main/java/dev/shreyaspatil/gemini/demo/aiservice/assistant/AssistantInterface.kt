@@ -5,19 +5,13 @@ import com.google.ai.client.generativeai.type.FunctionResponsePart
 import com.google.ai.client.generativeai.type.Schema
 import com.google.ai.client.generativeai.type.defineFunction
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.Date
 
 interface AssistantInterface {
-    suspend fun findOnGithub(username: String): String?
-    suspend fun sendSms(contactName: String, message: String): String?
-    suspend fun sendWhatsAppMessage(contactName: String, message: String): String?
-    suspend fun getCurrentDateTime(): String {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        val currentDate = Date()
-        val formattedDate = dateFormat.format(currentDate)
-        return formattedDate
-    }
+    suspend fun findOnGithub(username: String): String
+    suspend fun sendSms(contactName: String, message: String): String
+    suspend fun sendWhatsAppMessage(contactName: String, message: String): String
+    suspend fun addToList(item: String): String
+    suspend fun getAllItems(): String
 }
 
 object AssistantInterfaceAdapter {
@@ -47,15 +41,24 @@ object AssistantInterfaceAdapter {
             requiredParameters = listOf("contactName", "message")
         ),
         defineFunction(
-            name = "getCurrentDateTime",
-            description = "Finds current date and time",
-            parameters = emptyList(),
-            requiredParameters = emptyList()
-        )
+            name = "addToTODOs",
+            description = "Adds a item to the TODO list",
+            parameters = listOf(
+                Schema.str("item", "Item/message to be added in a TODO list"),
+            ),
+            requiredParameters = listOf("item")
+        ),
+        defineFunction(
+            name = "getAllTODOItems",
+            description = "Get all items from the TODO list",
+            parameters = listOf(
+                Schema.str("items", "Items of the todo list"),
+            ),
+        ),
     )
 
-    suspend fun invoke(functions: List<FunctionCallPart>, assistantInterface: AssistantInterface) {
-        functions.forEach { function ->
+    suspend fun invoke(functions: List<FunctionCallPart>, assistantInterface: AssistantInterface): List<FunctionResponsePart> {
+        return functions.map { function ->
             invoke(function, assistantInterface)
         }
     }
@@ -69,7 +72,7 @@ object AssistantInterfaceAdapter {
                 val username = function.args["username"] as String
                 FunctionResponsePart(
                     function.name,
-                    ResponseTemplates.githubUser(assistantInterface.findOnGithub(username))
+                    ResponseTemplates.result(assistantInterface.findOnGithub(username))
                 )
             }
 
@@ -78,7 +81,7 @@ object AssistantInterfaceAdapter {
                 val message = function.args["message"] as String
                 FunctionResponsePart(
                     function.name,
-                    ResponseTemplates.message(assistantInterface.sendSms(contactName, message))
+                    ResponseTemplates.result(assistantInterface.sendSms(contactName, message))
                 )
             }
 
@@ -87,7 +90,7 @@ object AssistantInterfaceAdapter {
                 val message = function.args["message"] as String
                 FunctionResponsePart(
                     function.name,
-                    ResponseTemplates.message(
+                    ResponseTemplates.result(
                         assistantInterface.sendWhatsAppMessage(
                             contactName,
                             message
@@ -96,10 +99,18 @@ object AssistantInterfaceAdapter {
                 )
             }
 
-            "getCurrentDateTime" -> {
+            "addToTODOs" -> {
+                val item = function.args["item"] as String
                 FunctionResponsePart(
                     function.name,
-                    ResponseTemplates.currentTime(assistantInterface.getCurrentDateTime())
+                    ResponseTemplates.result(assistantInterface.addToList(item))
+                )
+            }
+
+            "getAllTODOItems" -> {
+                FunctionResponsePart(
+                    function.name,
+                    ResponseTemplates.result(assistantInterface.getAllItems())
                 )
             }
 
@@ -108,18 +119,6 @@ object AssistantInterfaceAdapter {
     }
 
     object ResponseTemplates {
-        fun githubUser(details: String?) = if (details != null) JSONObject(details) else JSONObject(
-            mapOf("error" to "User not found on GitHub")
-        )
-
-        fun message(status: String?) = if (status != null) {
-            JSONObject(mapOf("status" to "OK"))
-        } else {
-            JSONObject(mapOf("status" to "failed to send sms"))
-        }
-
-        fun currentTime(details: String): JSONObject {
-            return JSONObject(mapOf("time" to details))
-        }
+        fun result(status: String) = JSONObject(mapOf("result" to status))
     }
 }

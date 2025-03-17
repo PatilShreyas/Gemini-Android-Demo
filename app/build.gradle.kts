@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.ktor.client)
 
     // Testing
     testImplementation(libs.junit)

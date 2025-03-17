@@ -1,5 +1,6 @@
 package dev.shreyaspatil.gemini.demo
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.shreyaspatil.gemini.demo.ui.screen.assistant.AssistantActivity
 import dev.shreyaspatil.gemini.demo.ui.screen.imagecaption.ImageCaptionGenActivity
 import dev.shreyaspatil.gemini.demo.ui.screen.simpleprompt.SimplePromptActivity
 import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
@@ -25,6 +27,11 @@ class MainActivity : ComposeActivity() {
     @Composable
     override fun RenderScreen() {
         MenuScreen(onNavigateTo = ::navigate)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), 101)
     }
 
     private fun navigate(activityClass: KClass<out Activity>) {
@@ -51,6 +58,7 @@ fun MenuScreen(onNavigateTo: (KClass<out Activity>) -> Unit = {}) {
         ) {
             Menu("Simple Prompt") { onNavigateTo(SimplePromptActivity::class) }
             Menu("Image Caption Generate") { onNavigateTo(ImageCaptionGenActivity::class) }
+            Menu("Assistant") { onNavigateTo(AssistantActivity::class) }
         }
     }
 }

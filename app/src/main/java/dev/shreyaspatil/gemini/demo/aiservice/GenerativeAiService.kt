@@ -35,6 +35,8 @@ class GenerativeAiService private constructor(
         }
     }
 
+    fun startAssistantChat() = modelRepository.getAssistantChatClient().startChat()
+
     companion object {
         val instance = GenerativeAiService(GenerativeModelRepository())
     }
