@@ -9,6 +9,9 @@ import dev.shreyaspatil.gemini.demo.BuildConfig
 import dev.shreyaspatil.gemini.demo.aiservice.assistant.AssistantInterfaceAdapter
 
 class GenerativeModelRepository {
+    /**
+     * Get Simple Generative Model Client.
+     */
     fun getSimpleClient() = GenerativeModel(
         modelName = MODEL_ID,
         apiKey = BuildConfig.GEMINI_API_KEY,
@@ -17,6 +20,9 @@ class GenerativeModelRepository {
         },
     )
 
+    /**
+     * Get Image Caption Generative Model Client.
+     */
     fun getImageCaptionClient() = GenerativeModel(
         modelName = MODEL_ID,
         apiKey = BuildConfig.GEMINI_API_KEY,
@@ -36,6 +42,9 @@ class GenerativeModelRepository {
         },
     )
 
+    /**
+     * Get Assistant Chat Generative Model Client.
+     */
     fun getAssistantChatClient() = GenerativeModel(
         "gemini-2.0-flash",
         BuildConfig.GEMINI_API_KEY,
