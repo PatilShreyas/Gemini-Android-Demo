@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -95,10 +96,12 @@ fun AssistantScreen(messages: List<Message>, onSendMessage: (String) -> Unit = {
         }
     ) {
         MessageList(
-            Modifier
+            modifier = Modifier
                 .padding(it)
                 .fillMaxWidth()
-                .padding(16.dp), messages
+                .padding(16.dp)
+                .imePadding(),
+            messages = remember(messages) { messages.reversed() }
         )
     }
 }

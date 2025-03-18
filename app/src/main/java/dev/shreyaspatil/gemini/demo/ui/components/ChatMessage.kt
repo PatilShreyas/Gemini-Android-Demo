@@ -56,7 +56,7 @@ fun ChatMessage(modifier: Modifier, isLoading: Boolean, sentByUser: Boolean, mes
 
 @Composable
 fun MessageList(modifier: Modifier, messages: List<Message>) {
-    LazyColumn(modifier) {
+    LazyColumn(modifier, reverseLayout = true) {
         items(messages) {
             ChatMessage(
                 modifier = Modifier
