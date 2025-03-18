@@ -42,7 +42,6 @@ fun ChatMessage(modifier: Modifier, isLoading: Boolean, sentByUser: Boolean, mes
         Text(
             text = message,
             modifier = Modifier.widthIn(max = maxWidth * 0.8f),
-            textAlign = if (sentByUser) androidx.compose.ui.text.style.TextAlign.End else androidx.compose.ui.text.style.TextAlign.Start,
             color = MaterialTheme.colorScheme.onPrimary
         )
         if (isLoading) {
