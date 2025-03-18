@@ -7,7 +7,6 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import android.util.Log
 import androidx.core.net.toUri
 import dev.shreyaspatil.gemini.demo.aiservice.assistant.AssistantInterface
 import io.ktor.client.HttpClient
@@ -15,6 +14,11 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
+/**
+ * Default implementation of [AssistantInterface].
+ * AssistantService is a service that provides various assistant functionalities that interacts
+ * with the device.
+ */
 class AssistantService(
     private val context: Context,
     private val httpClient: HttpClient = HttpClient()
@@ -65,11 +69,11 @@ class AssistantService(
     private fun findPhoneNumberByName(contactName: String): String? {
         val contentResolver = context.contentResolver
         val cursor: Cursor? = contentResolver.query(
-            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
-            "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} = ?",
-            arrayOf(contactName),
-            null
+            /* uri = */ ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            /* projection = */ arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+            /* selection = */ "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} LIKE ?",
+            /* selectionArgs = */ arrayOf("%$contactName%"),
+            /* sortOrder = */ null
         )
 
         return cursor?.use {
