@@ -1,8 +1,6 @@
 package dev.shreyaspatil.gemini.demo.aiservice
 
 import android.graphics.Bitmap
-import com.google.ai.client.generativeai.type.Content
-import com.google.ai.client.generativeai.type.GenerateContentResponse
 import com.google.ai.client.generativeai.type.content
 import dev.shreyaspatil.gemini.demo.aiservice.model.CaptionResponse
 import kotlinx.serialization.json.Json
