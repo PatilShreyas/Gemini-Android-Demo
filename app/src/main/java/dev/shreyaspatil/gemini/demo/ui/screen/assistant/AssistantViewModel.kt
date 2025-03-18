@@ -3,6 +3,7 @@ package dev.shreyaspatil.gemini.demo.ui.screen.assistant
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.ai.client.generativeai.type.GenerateContentResponse
 import com.google.ai.client.generativeai.type.content
 import dev.shreyaspatil.gemini.demo.AssistantService
 import dev.shreyaspatil.gemini.demo.aiservice.GenerativeAiService
@@ -33,18 +34,24 @@ class AssistantViewModel(
             addUserMessage(message)
             addModelLoadingResponse()
 
-            val currentResponse = chat.sendMessage(message)
+            val response = chat.sendMessage(message)
+            addModelFinalResponse(response.proceedToFunctionCallIfRequired().text ?: "")
+        }
+    }
 
-            val functionResponses =
-                AssistantInterfaceAdapter.invoke(currentResponse.functionCalls, assistantInterface)
-            val response = if (functionResponses.isNotEmpty()) {
-                chat.sendMessage(content("function") {
-                    parts.addAll(functionResponses)
-                })
-            } else {
-                currentResponse
-            }
-            addModelFinalResponse(response.text ?: "")
+    /**
+     * Proceeds to function call if required.
+     *
+     * @return [GenerateContentResponse] after proceeding to function call if required.
+     */
+    private suspend fun GenerateContentResponse.proceedToFunctionCallIfRequired(): GenerateContentResponse {
+        val functionResponses = AssistantInterfaceAdapter.invoke(functionCalls, assistantInterface)
+        return if (functionResponses.isNotEmpty()) {
+            chat.sendMessage(content("function") {
+                parts.addAll(functionResponses)
+            }).proceedToFunctionCallIfRequired()
+        } else {
+            return this
         }
     }
 
