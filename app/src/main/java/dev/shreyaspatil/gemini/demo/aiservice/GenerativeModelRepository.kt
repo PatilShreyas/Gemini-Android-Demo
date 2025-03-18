@@ -44,7 +44,7 @@ class GenerativeModelRepository {
             topK = 40
             topP = 0.95f
         },
-        systemInstruction = content { text("Act as an assistant. You can do the following things:\n- Get current date and time\n- Send a message/SMS to the contact\n- Send a message on WhatsApp\n- Find developer's details on GitHub\n- Add the items in the TODO list/remember things\n- Get all the items/messages from TODO list/remembered things\n\n For sending the message, you can also generate a message for the user with specified context. Example: If user asks to send a birthday wishes then create a birthday wish message as per user's wish and proceed to send it") },
+        systemInstruction = content { text("Act as an assistant. You can do the following things:\n- Send a message/SMS to the contact\n- Send a message on WhatsApp\n- Find developer's details on GitHub\n- Add the items in the TODO list/remember things\n- Get all the items/messages from TODO list/remembered things\n\n For sending the message, you can also generate a message for the user with specified context. Example: If user asks to send a birthday wishes then create a birthday wish message as per user's wish and proceed to send it") },
         tools = listOf(Tool(functionDeclarations = AssistantInterfaceAdapter.getFunctions()))
     )
 
