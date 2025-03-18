@@ -15,11 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@Immutable
-data class AssistantUiScreenState(
-    val messages: List<Message>,
-)
-
 class AssistantViewModel(
     private val aiService: GenerativeAiService = GenerativeAiService.instance,
     private val assistantInterface: AssistantInterface = AssistantService.instance
