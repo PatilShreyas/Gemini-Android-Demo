@@ -23,6 +23,10 @@ import dev.shreyaspatil.gemini.demo.ui.screen.simpleprompt.SimplePromptActivity
 import dev.shreyaspatil.gemini.demo.ui.theme.GeminiDemoTheme
 import kotlin.reflect.KClass
 
+class Menu<T : Activity>(val label: String, val activityClass: KClass<T>)
+
+inline fun <reified T : Activity> menu(label: String) = Menu(label, T::class)
+
 class MainActivity : ComposeActivity() {
     @Composable
     override fun RenderScreen() {
@@ -38,6 +42,12 @@ class MainActivity : ComposeActivity() {
         startActivity(Intent(this, activityClass.java))
     }
 }
+
+val menus = listOf(
+    menu<SimplePromptActivity>("Simple Prompt"),
+    menu<ImageCaptionGenActivity>("Image Caption Generate"),
+    menu<AssistantActivity>("Assistant")
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,9 +66,9 @@ fun MenuScreen(onNavigateTo: (KClass<out Activity>) -> Unit = {}) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Menu("Simple Prompt") { onNavigateTo(SimplePromptActivity::class) }
-            Menu("Image Caption Generate") { onNavigateTo(ImageCaptionGenActivity::class) }
-            Menu("Assistant") { onNavigateTo(AssistantActivity::class) }
+            menus.forEach { menu ->
+                Menu(menu.label, onClick = { onNavigateTo(menu.activityClass) })
+            }
         }
     }
 }
