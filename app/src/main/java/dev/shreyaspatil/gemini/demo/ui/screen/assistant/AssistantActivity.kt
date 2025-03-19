@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -49,6 +50,7 @@ class AssistantActivity : ComposeActivity() {
 @Composable
 fun AssistantScreen(messages: List<Message>, onSendMessage: (String) -> Unit = {}) {
     Scaffold(
+        modifier = Modifier.windowInsetsPadding(WindowInsets.ime),
         topBar = {
             TopAppBar(title = {
                 Text("Assistant")
