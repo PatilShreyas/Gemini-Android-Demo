@@ -73,7 +73,7 @@ fun SimplePromptScreen(
     Scaffold(
         topBar = {
             TopAppBar(title = {
-                Text("Simple Prompt")
+                Text("Image Captioning")
             })
         }
     ) {
